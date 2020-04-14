@@ -19,6 +19,7 @@ class Aplicacion:
         self.ventana_principal.title('Arriendos')
         self.notebook = ttk.Notebook(self.ventana_principal)
         self.primera_pagina()
+        self.segunda_pagina()
         self.notebook.grid(column = 0, row = 0, padx = 10, pady = 10)
         self.ventana_principal.mainloop()
         
@@ -41,7 +42,25 @@ class Aplicacion:
         ttk.Button(self.label_frame, text = 'Agregar', command = self.validacion_datos).grid(column = 0, row = 3, columnspan = 2, sticky = 'we', padx = 4, pady = 10)
     
     def segunda_pagina(self):
-        pass
+
+        self.pagina2 = ttk.Frame(self.notebook)
+        self.notebook.add(self.pagina2, text = 'Listado de Inquilinos')
+        self.label_frame = ttk.Labelframe(self.pagina2, text = 'Datos de inquilinos')
+        self.label_frame.grid(column = 0, row = 0, padx = 5, pady = 10)
+        #creacion de boton 
+        ttk.Button(self.label_frame, text = 'Mostrar listado', command = self.obtener_inquilinos).grid(column = 0, row = 0, padx = 4, pady = 4, sticky = 'we')
+        #creacion de tabla
+        self.tree = ttk.Treeview(self.label_frame, columns = (1,2,3), show = 'headings', height = '5')
+        self.tree.grid(column = 0, row = 1, padx = 4, pady = 5)
+        self.tree.heading(1, text = 'Nombre')
+        self.tree.heading(2, text = 'Cedula')
+        self.tree.heading(3, text = 'Celular')
+        ttk.Button(self.label_frame, text = 'Modificar').grid(column = 0, row = 2, columnspan = 1)
+        ttk.Button(self.label_frame, text = 'Eliminar').grid(column = 0, row = 2, columnspan = 2)
+
+        
+
+
     
     def tercera_pagina(self):
         pass
@@ -63,6 +82,17 @@ class Aplicacion:
         else:
             self.agregar_inquilino()
     
+    def obtener_inquilinos(self):
+        self.limpiar_tabla()
+        rows = self.logica.obtener()
+        for row in rows:
+            self.tree.insert('', 'end', values = row)
+            
+    def limpiar_tabla(self):
+        records = self.tree.get_children()
+        for element in records:
+            self.tree.delete(element)
+            
 
 app = Aplicacion()
 

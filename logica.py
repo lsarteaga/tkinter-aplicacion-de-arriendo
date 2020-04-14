@@ -19,4 +19,13 @@ class Logica:
         cursor.execute(sql, datos_inquilino)
         cone.commit()
         cone.close()
+    def obtener(self):
+        try:
+            cone = self.establecer_conexion()
+            cursor = cone.cursor()
+            sql = 'SELECT nombre,cedula,celular FROM inquilinos'
+            cursor.execute(sql)
+            return cursor.fetchall()
+        finally:
+            cone.close
 

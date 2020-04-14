@@ -19,6 +19,7 @@ class Logica:
         cursor.execute(sql, datos_inquilino)
         cone.commit()
         cone.close()
+        
     def obtener(self):
         try:
             cone = self.establecer_conexion()
@@ -28,4 +29,17 @@ class Logica:
             return cursor.fetchall()
         finally:
             cone.close
+        
+    def eliminar(self, valor):
+        cone = self.establecer_conexion()
+        cursor = cone.cursor()
+        sql = 'DELETE FROM inquilinos WHERE nombre = ?'
+        cursor.execute(sql, (valor, ))
+        cone.commit()
+        cone.close()
+        
+        
+        
+        
+        
 

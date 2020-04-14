@@ -50,7 +50,7 @@ class Aplicacion:
         ttk.Label(self.pagina2, text = '').grid(column = 2, row = 0, padx = 4, pady = 4)
 
         #creacion de boton 
-        ttk.Button(self.pagina2, text = 'Mostrar listado', command = self.obtener_inquilinos).grid(column = 0, row = 0, padx = 4, pady = 4, columnspan = 3, sticky ='we')
+        ttk.Button(self.pagina2, text = 'Actualizar', command = self.obtener_inquilinos).grid(column = 0, row = 0, padx = 4, pady = 4, columnspan = 3, sticky ='we')
         
         #creacion de tabla
         self.tree = ttk.Treeview(self.pagina2, columns = (1,2,3), show = 'headings', height = '5')
@@ -59,15 +59,25 @@ class Aplicacion:
         self.tree.heading(2, text = 'Cedula')
         self.tree.heading(3, text = 'Celular')
         ttk.Button(self.pagina2, text = 'Modificar').grid(column = 1, row = 3, columnspan = 1, sticky = 'we')
-        ttk.Button(self.pagina2, text = 'Eliminar').grid(column = 2, row = 3, columnspan = 1, sticky = 'ew')
+        ttk.Button(self.pagina2, text = 'Eliminar', command = self.eliminar_inquilino).grid(column = 2, row = 3, columnspan = 1, sticky = 'ew')
         
     def modificar_inquilino(self):
         pass
     
     def eliminar_inquilino(self):
-        pass
-    
-    
+        try:
+            self.tree.item(self.tree.selection())['values'][0]
+        except IndexError as e:
+            mb.showwarning('Atencion', 'Debe seleccionar un registro')
+            return
+        #aqui retorna una tupla de todos los campos (nombre,cedula,celular)
+        valor = self.tree.item(self.tree.selection())['values']
+        self.logica.eliminar(valor[0])
+        mb.showinfo('Informacion','Registro eliminado')
+        #para eliminar el registro de la tabla
+        item = self.tree.selection()
+        self.tree.delete(item)
+        
     def agregar_inquilino(self):
         
         datos_inquilino = (self.nombre_inquilino.get(), self.cedula_inquilino.get(), self.celular_inquilino.get())

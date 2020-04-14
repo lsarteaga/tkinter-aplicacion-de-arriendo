@@ -6,11 +6,11 @@ Created on Mon Apr 13 15:00:31 2020
 @author: lsarteaga
 """
 #importaciones
+import sqlite3
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox as mb
 import logica
-import sqlite3
 
 class Aplicacion:
     def __init__(self):
@@ -18,12 +18,11 @@ class Aplicacion:
         self.ventana_principal = tk.Tk()
         self.ventana_principal.title('Arriendos')
         self.notebook = ttk.Notebook(self.ventana_principal)
-        self.agregar_inquilino()
-        self.listado_inquilinos()
+        self.primera_pagina()
         self.notebook.grid(column = 0, row = 0, padx = 10, pady = 10)
         self.ventana_principal.mainloop()
         
-    def agregar_inquilino(self):
+    def primera_pagina(self):
         self.pagina_agregar = ttk.Frame(self.notebook)
         self.notebook.add(self.pagina_agregar, text = 'Agregar Inquilino')
         self.label_frame = ttk.Labelframe(self.pagina_agregar, text = 'Datos inquilino')
@@ -39,13 +38,30 @@ class Aplicacion:
         self.celular_inquilino =tk.StringVar()
         ttk.Entry(self.label_frame, textvariable = self.celular_inquilino).grid(column = 1, row = 2, padx = 4, pady = 4)
         #boton para agregar
-        ttk.Button(self.label_frame, text = 'Agregar').grid(column = 0, row = 3, columnspan = 2, sticky = 'we', padx = 4, pady = 10)
+        ttk.Button(self.label_frame, text = 'Agregar', command = self.validacion_datos).grid(column = 0, row = 3, columnspan = 2, sticky = 'we', padx = 4, pady = 10)
     
-    def listado_inquilinos(self):
+    def segunda_pagina(self):
         pass
     
-    def cobrar_arriendo(self):
+    def tercera_pagina(self):
         pass
+    
+    def agregar_inquilino(self):
+        
+        datos_inquilino = (self.nombre_inquilino.get(), self.cedula_inquilino.get(), self.celular_inquilino.get())
+        self.logica.agregar(datos_inquilino)
+        mb.showinfo('Informacion', 'Registro exitoso')
+        #vaciando los campos de entrada
+        self.nombre_inquilino.set('')
+        self.cedula_inquilino.set('')
+        self.celular_inquilino.set('')
+        
+        
+    def validacion_datos(self):
+        if self.nombre_inquilino.get() == '' or self.cedula_inquilino.get() == '' or self.celular_inquilino.get() == '':
+            mb.showwarning('Atencion','Debe llenar todos los campos')
+        else:
+            self.agregar_inquilino()
     
 
 app = Aplicacion()

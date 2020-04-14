@@ -45,25 +45,28 @@ class Aplicacion:
 
         self.pagina2 = ttk.Frame(self.notebook)
         self.notebook.add(self.pagina2, text = 'Listado de Inquilinos')
-        self.label_frame = ttk.Labelframe(self.pagina2, text = 'Datos de inquilinos')
-        self.label_frame.grid(column = 0, row = 0, padx = 5, pady = 10)
+        ttk.Label(self.pagina2, text = '').grid(column = 0, row = 0, padx = 4, pady = 4)
+        ttk.Label(self.pagina2, text = '').grid(column = 1, row = 0, padx = 4, pady = 4)
+        ttk.Label(self.pagina2, text = '').grid(column = 2, row = 0, padx = 4, pady = 4)
+
         #creacion de boton 
-        ttk.Button(self.label_frame, text = 'Mostrar listado', command = self.obtener_inquilinos).grid(column = 0, row = 0, padx = 4, pady = 4, sticky = 'we')
+        ttk.Button(self.pagina2, text = 'Mostrar listado', command = self.obtener_inquilinos).grid(column = 0, row = 0, padx = 4, pady = 4, columnspan = 3, sticky ='we')
+        
         #creacion de tabla
-        self.tree = ttk.Treeview(self.label_frame, columns = (1,2,3), show = 'headings', height = '5')
-        self.tree.grid(column = 0, row = 1, padx = 4, pady = 5)
+        self.tree = ttk.Treeview(self.pagina2, columns = (1,2,3), show = 'headings', height = '5')
+        self.tree.grid(column = 0, row = 2, padx = 4, pady = 5, columnspan = 3, sticky = 'we')
         self.tree.heading(1, text = 'Nombre')
         self.tree.heading(2, text = 'Cedula')
         self.tree.heading(3, text = 'Celular')
-        ttk.Button(self.label_frame, text = 'Modificar').grid(column = 0, row = 2, columnspan = 1)
-        ttk.Button(self.label_frame, text = 'Eliminar').grid(column = 0, row = 2, columnspan = 2)
-
+        ttk.Button(self.pagina2, text = 'Modificar').grid(column = 1, row = 3, columnspan = 1, sticky = 'we')
+        ttk.Button(self.pagina2, text = 'Eliminar').grid(column = 2, row = 3, columnspan = 1, sticky = 'ew')
         
-
-
-    
-    def tercera_pagina(self):
+    def modificar_inquilino(self):
         pass
+    
+    def eliminar_inquilino(self):
+        pass
+    
     
     def agregar_inquilino(self):
         

@@ -50,7 +50,7 @@ class Aplicacion:
         ttk.Label(self.pagina2, text = '').grid(column = 2, row = 0, padx = 4, pady = 4)
 
         #creacion de boton 
-        ttk.Button(self.pagina2, text = 'Actualizar', command = self.obtener_inquilinos).grid(column = 0, row = 0, padx = 4, pady = 4, columnspan = 3, sticky ='we')
+        ttk.Button(self.pagina2, text = 'Actualizar Registros', command = self.obtener_inquilinos).grid(column = 0, row = 0, padx = 4, pady = 4, columnspan = 3, sticky ='we')
         
         #creacion de tabla
         self.tree = ttk.Treeview(self.pagina2, columns = (1,2,3), show = 'headings', height = '5')
@@ -58,13 +58,53 @@ class Aplicacion:
         self.tree.heading(1, text = 'Nombre')
         self.tree.heading(2, text = 'Cedula')
         self.tree.heading(3, text = 'Celular')
-        ttk.Button(self.pagina2, text = 'Modificar').grid(column = 1, row = 3, columnspan = 1, sticky = 'we')
-        ttk.Button(self.pagina2, text = 'Eliminar', command = self.eliminar_inquilino).grid(column = 2, row = 3, columnspan = 1, sticky = 'ew')
+        ttk.Button(self.pagina2, text = 'Modificar Registro', command = self.modificar_inquilino).grid(column = 1, row = 3, columnspan = 1, sticky = 'we')
+        ttk.Button(self.pagina2, text = 'Eliminar Registro', command = self.eliminar_inquilino).grid(column = 2, row = 3, columnspan = 1, sticky = 'ew')
         
     def modificar_inquilino(self):
-        pass
-    
+        try:
+            self.tree.item(self.tree.selection())['values'][0]
+        except IndexError as e:
+            mb.showwarning('Atencion', 'Debe seleccionar un registro')
+            return
+        self.datos_antiguos = self.tree.item(self.tree.selection())['values']
+        #creacion de la ventana para actualizar datos
+        self.dialogo = tk.Toplevel(self.pagina2)
+        ttk.Label(self.dialogo, text = 'NUEVO NOMBRE: ').grid(column = 0, row = 0, padx = 4, pady = 4)
+        ttk.Entry(self.dialogo, textvariable = self.nombre_inquilino).grid(column = 1, row = 0, padx = 4, pady = 4)
+        ttk.Label(self.dialogo, text = 'NUEVA CEDULA: ').grid(column = 0, row = 1, padx = 4, pady = 4)
+        ttk.Entry(self.dialogo, textvariable = self.cedula_inquilino).grid(column = 1, row = 1, padx = 4, pady = 4)
+        ttk.Label(self.dialogo, text = 'NUEVO CELULAR: ').grid(column = 0, row = 2, padx = 4, pady = 4)
+        ttk.Entry(self.dialogo, textvariable = self.celular_inquilino).grid(column = 1, row = 2, padx = 4, pady = 4)
+        ttk.Button(self.dialogo, text = 'ACTUALIZAR', command = self.verificar_dialogo).grid(column = 0, row = 3, padx = 4, pady = 4, columnspan = 2, sticky = 'we')
+        self.dialogo.protocol("WM_DELETE_WINDOW")        
+        self.dialogo.grab_set()
+      
+    def actualizar_datos(self):
+        self.datos_actualizados = (self.nombre_inquilino.get(), self.cedula_inquilino.get(), self.celular_inquilino.get(), self.datos_antiguos[0])
+        self.logica.actualizar(self.datos_actualizados)
+        mb.showinfo('Informacion','Registro actualizado')
+        self.dialogo.destroy()
+        datos_muestra = (self.nombre_inquilino.get(), self.cedula_inquilino.get(), self.celular_inquilino.get())
+        self.nombre_inquilino.set('')
+        self.cedula_inquilino.set('')
+        self.celular_inquilino.set('')
+        #se obtiene la posicion de la fila seleccionada en la tabla
+        #se elimina dicha fila
+        #se ingresa al final de la tabla una nueva fila con los datos actualizados usando la variable 'datos_muestra'
+        #al pulsar ACTUALIZAR las filas modificadas recuperan su posicion 
+        item = self.tree.selection()
+        self.tree.delete(item)
+        self.tree.insert('', 'end' ,values = datos_muestra)
+        
+    def verificar_dialogo(self):
+        if self.nombre_inquilino.get() == '' or self.cedula_inquilino.get() == '' or self.celular_inquilino.get() == '':
+            mb.showwarning('Atencion','Debe llenar todos los campos')
+        else:
+            self.actualizar_datos()    
+
     def eliminar_inquilino(self):
+        
         try:
             self.tree.item(self.tree.selection())['values'][0]
         except IndexError as e:
@@ -77,7 +117,7 @@ class Aplicacion:
         #para eliminar el registro de la tabla
         item = self.tree.selection()
         self.tree.delete(item)
-        
+    
     def agregar_inquilino(self):
         
         datos_inquilino = (self.nombre_inquilino.get(), self.cedula_inquilino.get(), self.celular_inquilino.get())

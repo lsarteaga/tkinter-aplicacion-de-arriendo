@@ -12,6 +12,7 @@ class Logica:
     def establecer_conexion(self):
         conexion = sqlite3.connect('arriendo.db')
         return conexion
+    
     def agregar(self, datos_inquilino):
         cone = self.establecer_conexion()
         cursor = cone.cursor()
@@ -37,7 +38,14 @@ class Logica:
         cursor.execute(sql, (valor, ))
         cone.commit()
         cone.close()
-        
+    
+    def actualizar(self, datos_actualizados):
+        cone = self.establecer_conexion()
+        cursor = cone.cursor()
+        sql = 'UPDATE inquilinos SET nombre = ?, cedula = ?, celular = ? WHERE nombre = ?'
+        cursor.execute(sql, datos_actualizados)
+        cone.commit()
+        cone.close()
         
         
         

@@ -8,18 +8,22 @@ Created on Mon Apr 13 15:00:31 2020
 #importaciones
 import sqlite3
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk 
 from tkinter import messagebox as mb
 import logica
 
 class Aplicacion:
     def __init__(self):
         self.logica = logica.Logica()
+        #insertando cambios de la base de datos
+        self.logica.cambios_db()
+        
         self.ventana_principal = tk.Tk()
         self.ventana_principal.title('Arriendos')
         self.notebook = ttk.Notebook(self.ventana_principal)
         self.primera_pagina()
         self.segunda_pagina()
+        self.tercera_pagina()
         self.notebook.grid(column = 0, row = 0, padx = 10, pady = 10)
         self.ventana_principal.mainloop()
         
@@ -60,6 +64,26 @@ class Aplicacion:
         self.tree.heading(3, text = 'Celular')
         ttk.Button(self.pagina2, text = 'Modificar Registro', command = self.modificar_inquilino).grid(column = 1, row = 3, columnspan = 1, sticky = 'we')
         ttk.Button(self.pagina2, text = 'Eliminar Registro', command = self.eliminar_inquilino).grid(column = 2, row = 3, columnspan = 1, sticky = 'ew')
+    
+    def tercera_pagina(self):
+        self.pagina3 = ttk.Frame(self.notebook)
+        self.notebook.add(self.pagina3, text = 'Cobrar Arriendo')
+        ttk.Label(self.pagina3, text = '').grid(column = 0, row = 0, padx = 4, pady = 4)
+        ttk.Label(self.pagina3, text = '').grid(column = 1, row = 0, padx = 4, pady = 4)
+        ttk.Label(self.pagina3, text = '').grid(column = 2, row = 0, padx = 4, pady = 4)
+        #boton para mostrar inquilinos
+        ttk.Button(self.pagina3, text = 'Mostrar Inquilinos').grid(column = 0, row = 0, padx = 4, pady = 4, columnspan = 3, sticky ='we')
+        #creacion de la tabla
+        self.tree2 = ttk.Treeview(self.pagina3, columns = (1,2,3), show = 'headings', height = '5')
+        self.tree2.grid(column = 0, row = 2, padx = 4, pady = 5, columnspan = 3, sticky = 'we')
+        self.tree2.heading(1, text = 'Nombre')
+        self.tree2.heading(2, text = 'Mes')
+        self.tree2.heading(3, text = 'Estado')
+        #botones para cobrar y mostrar detalle de pago
+        ttk.Button(self.pagina3, text = 'Detalle').grid(column = 1, row = 3, padx = 4, pady = 4, sticky = 'we')
+        ttk.Button(self.pagina3, text = 'Cobrar').grid(column = 2, row = 3, padx = 4, pady = 4, sticky = 'we')
+
+        
         
     def modificar_inquilino(self):
         try:

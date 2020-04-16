@@ -72,9 +72,33 @@ class Logica:
             return cursor.fetchall()
         finally:
             conn.close()
-    
+            
+    def realizar_cobro(self, idmes_idinq):
+        conn = self.establecer_conexion()
+        cursor = conn.cursor()
+        sql = 'INSERT INTO inquilino_arriendo (id_arriendo, id_inquilino) VALUES (?,?)'
+        cursor.execute(sql, idmes_idinq)
+        conn.commit()
+        conn.close()
         
+    def obtener_ids(self, datos):
+        try:
+            conn = self.establecer_conexion()
+            cursor = conn.cursor()
+            sql = 'SELECT id_inquilino FROM inquilinos WHERE nombre = ? UNION SELECT id_arriendo FROM arriendos WHERE mes = ?'
+            cursor.execute(sql, datos)
+            return cursor.fetchall()
+        finally:
+            conn.close()
         
-        
+    def verificar_existencia(self, valor):
+        try:
+            conn = self.establecer_conexion()
+            cursor = conn.cursor()
+            sql = 'SELECT nombre FROM inquilinos WHERE nombre = ?'
+            cursor.execute(sql, valor)
+            return cursor.fetchone()
+        finally:
+            conn.close()
         
 

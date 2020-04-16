@@ -7,7 +7,9 @@ Created on Mon Apr 13 15:00:31 2020
 """
 #importaciones
 import sqlite3
+
 import tkinter as tk
+
 from tkinter import ttk 
 from tkinter import messagebox as mb
 import logica
@@ -54,7 +56,7 @@ class Aplicacion:
         ttk.Label(self.pagina2, text = '').grid(column = 2, row = 0, padx = 4, pady = 4)
 
         #creacion de boton 
-        ttk.Button(self.pagina2, text = 'Actualizar Registros', command = self.obtener_inquilinos).grid(column = 0, row = 0, padx = 4, pady = 4, columnspan = 3, sticky ='we')
+        ttk.Button(self.pagina2, text = 'Mostrar Registros', command = self.obtener_inquilinos).grid(column = 0, row = 0, padx = 4, pady = 4, columnspan = 3, sticky ='we')
         
         #creacion de tabla
         self.tree = ttk.Treeview(self.pagina2, columns = (1,2,3), show = 'headings', height = '5')
@@ -72,25 +74,30 @@ class Aplicacion:
         ttk.Label(self.pagina3, text = '').grid(column = 1, row = 0, padx = 4, pady = 4)
         ttk.Label(self.pagina3, text = '').grid(column = 2, row = 0, padx = 4, pady = 4)
         #boton para mostrar inquilinos
-        ttk.Button(self.pagina3, text = 'Mostrar Inquilinos', command = self.insertar_nombres).grid(column = 0, row = 0, padx = 4, pady = 4, columnspan = 3, sticky ='we')
+        btn1 = tk.Button(self.pagina3, text = 'ACTUALIZAR REGISTROS', command = self.insertar_nombres, fg = 'red')
+        btn1.grid(column = 0, row = 0, padx = 4, pady = 4, columnspan = 3, sticky ='we')
         #creacion de la tabla
         self.tree2 = ttk.Treeview(self.pagina3, columns = (1,2,3), show = 'headings', height = '5')
         self.tree2.grid(column = 0, row = 2, padx = 4, pady = 5, columnspan = 3, sticky = 'we')
         self.tree2.heading(1, text = 'Nombre')
         self.tree2.heading(2, text = 'Cedula')
         self.tree2.heading(3, text = 'Celular')
+        
+       
         #botones para cobrar y mostrar detalle de pago
-        ttk.Button(self.pagina3, text = 'Cobrar').grid(column = 1, row = 3, padx = 4, pady = 4, sticky = 'we')
-        ttk.Button(self.pagina3, text = 'Detalle').grid(column = 2, row = 3, padx = 4, pady = 4, sticky = 'we')
+        ttk.Button(self.pagina3, text = 'Cobrar', command = self.cobrar).grid(column = 1, row = 3, padx = 4, pady = 4, sticky = 'we')
+        ttk.Button(self.pagina3, text = 'Detalle', command = self.detalle).grid(column = 2, row = 3, padx = 4, pady = 4, sticky = 'we')
+        
         #combo box para seleccionar meses
-        self.opcion = tk.StringVar()
+        self.opcion_seleccionada = tk.StringVar()
         lista = self.obtener_meses()
-        self.combo_box = ttk.Combobox(self.pagina3, textvariable = self.opcion, values = lista, state = 'readonly')
+        self.combo_box = ttk.Combobox(self.pagina3, textvariable = self.opcion_seleccionada, values = lista, state = 'readonly')
         self.combo_box.current(0)
         self.combo_box.grid(column = 0, row = 3, padx = 4, pady = 4, sticky ='we')
         
+
         
-        
+
         
     def modificar_inquilino(self):
         try:
@@ -157,8 +164,7 @@ class Aplicacion:
         #vaciando los campos de entrada
         self.nombre_inquilino.set('')
         self.cedula_inquilino.set('')
-        self.celular_inquilino.set('')
-        
+        self.celular_inquilino.set('')   
         
     def validacion_datos(self):
         if self.nombre_inquilino.get() == '' or self.cedula_inquilino.get() == '' or self.celular_inquilino.get() == '':
@@ -171,23 +177,66 @@ class Aplicacion:
         rows = self.logica.obtener()
         for row in rows:
             self.tree.insert('', 'end', values = row)
-            
+
     def limpiar_tabla(self):
         records = self.tree.get_children()
         for element in records:
             self.tree.delete(element)
             
     def insertar_nombres(self):
+        #limpieza de datos al pulsar el boton
+        records = self.tree2.get_children()
+        for element in records:
+            self.tree2.delete(element)
+        #obtencion de los datos 
         rows = self.logica.obtener()
         for row in rows:
             self.tree2.insert('', 'end', values = row)
-    
+            
+        
+           
     def obtener_meses(self):
+
         elementos = self.logica.obtener_arriendos()
         meses = []
         for item in elementos:
             meses.append(item[1])
         return meses
+    
+    def cobrar(self):
+   
+       try:
+           self.validar_seleccion()
+           #obtencion de datos en la fila seleccionada
+           dato_fila = self.tree2.item(self.tree2.selection())['values']
+           #verficando si la fila seleccionada existe en la base de datos
+           name = self.logica.verificar_existencia((dato_fila[0], ))
+           if name == None:
+               mb.showerror('ERROR','ACTUALICE REGISTROS')
+           else:
+               datos = (dato_fila[0], self.opcion_seleccionada.get())
+               #obteniendo solo los id de los campos seleccionados
+               identificadores = self.logica.obtener_ids(datos)
+               #identificadores es una lista de tuplas [(id_mes, ), (id_inquilino, )]
+               idmes_idinq = (identificadores[0][0], identificadores[1][0])
+               #se realiza un registro en la base de datos
+               self.logica.realizar_cobro(idmes_idinq)
+               mb.showinfo('Informacion','Cobro Realizado')
+       except sqlite3.OperationalError:
+           print('no existe valor en la base de datos')
+           return
+
        
+    def validar_seleccion(self):
+        try:
+            self.tree2.item(self.tree2.selection())['values'][0]
+        except IndexError as e:
+            mb.showwarning('Atencion', 'SELECCIONE REGISTRO')
+            return
+    
+    def detalle(self):
+        self.validar_seleccion()
+    
+    
 app = Aplicacion()
 

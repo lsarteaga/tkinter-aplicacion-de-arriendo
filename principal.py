@@ -77,12 +77,19 @@ class Aplicacion:
         self.tree2 = ttk.Treeview(self.pagina3, columns = (1,2,3), show = 'headings', height = '5')
         self.tree2.grid(column = 0, row = 2, padx = 4, pady = 5, columnspan = 3, sticky = 'we')
         self.tree2.heading(1, text = 'Nombre')
-        self.tree2.heading(2, text = 'Mes')
-        self.tree2.heading(3, text = 'Estado')
+        self.tree2.heading(2, text = 'Cedula')
+        self.tree2.heading(3, text = 'Celular')
         #botones para cobrar y mostrar detalle de pago
-        ttk.Button(self.pagina3, text = 'Detalle').grid(column = 1, row = 3, padx = 4, pady = 4, sticky = 'we')
-        ttk.Button(self.pagina3, text = 'Cobrar').grid(column = 2, row = 3, padx = 4, pady = 4, sticky = 'we')
-
+        ttk.Button(self.pagina3, text = 'Cobrar').grid(column = 1, row = 3, padx = 4, pady = 4, sticky = 'we')
+        ttk.Button(self.pagina3, text = 'Detalle').grid(column = 2, row = 3, padx = 4, pady = 4, sticky = 'we')
+        #combo box para seleccionar meses
+        self.opcion = tk.StringVar()
+        lista = self.obtener_meses()
+        self.combo_box = ttk.Combobox(self.pagina3, textvariable = self.opcion, values = lista, state = 'readonly')
+        self.combo_box.current(0)
+        self.combo_box.grid(column = 0, row = 3, padx = 4, pady = 4, sticky ='we')
+        
+        
         
         
     def modificar_inquilino(self):
@@ -172,11 +179,15 @@ class Aplicacion:
             
     def insertar_nombres(self):
         rows = self.logica.obtener()
-                
         for row in rows:
-            self.tree2.insert('', 'end', values = (row[0], ))   
-            
- 
+            self.tree2.insert('', 'end', values = row)
+    
+    def obtener_meses(self):
+        elementos = self.logica.obtener_arriendos()
+        meses = []
+        for item in elementos:
+            meses.append(item[1])
+        return meses
        
 app = Aplicacion()
 

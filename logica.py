@@ -63,7 +63,15 @@ class Logica:
         cone.close()
     
     #para obtener meses
-    
+    def obtener_arriendos(self):
+        try:
+            conn = self.establecer_conexion()
+            cursor = conn.cursor()
+            sql = 'SELECT * FROM arriendos'
+            cursor.execute(sql)
+            return cursor.fetchall()
+        finally:
+            conn.close()
     
         
         

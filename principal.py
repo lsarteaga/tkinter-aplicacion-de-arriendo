@@ -72,7 +72,7 @@ class Aplicacion:
         ttk.Label(self.pagina3, text = '').grid(column = 1, row = 0, padx = 4, pady = 4)
         ttk.Label(self.pagina3, text = '').grid(column = 2, row = 0, padx = 4, pady = 4)
         #boton para mostrar inquilinos
-        ttk.Button(self.pagina3, text = 'Mostrar Inquilinos').grid(column = 0, row = 0, padx = 4, pady = 4, columnspan = 3, sticky ='we')
+        ttk.Button(self.pagina3, text = 'Mostrar Inquilinos', command = self.insertar_nombres).grid(column = 0, row = 0, padx = 4, pady = 4, columnspan = 3, sticky ='we')
         #creacion de la tabla
         self.tree2 = ttk.Treeview(self.pagina3, columns = (1,2,3), show = 'headings', height = '5')
         self.tree2.grid(column = 0, row = 2, padx = 4, pady = 5, columnspan = 3, sticky = 'we')
@@ -170,6 +170,13 @@ class Aplicacion:
         for element in records:
             self.tree.delete(element)
             
-
+    def insertar_nombres(self):
+        rows = self.logica.obtener()
+                
+        for row in rows:
+            self.tree2.insert('', 'end', values = (row[0], ))   
+            
+ 
+       
 app = Aplicacion()
 

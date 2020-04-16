@@ -62,7 +62,9 @@ class Logica:
         cone.commit()
         cone.close()
     
-        
+    #para obtener meses
+    
+    
         
         
         

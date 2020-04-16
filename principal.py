@@ -226,7 +226,6 @@ class Aplicacion:
            print('no existe valor en la base de datos')
            return
 
-       
     def validar_seleccion(self):
         try:
             self.tree2.item(self.tree2.selection())['values'][0]

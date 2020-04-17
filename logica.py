@@ -47,20 +47,6 @@ class Logica:
         cone.commit()
         cone.close()
         
-    #creando nuevas tablas y relacionandolas
-    def cambios_db(self):
-        cone = self.establecer_conexion()
-        cursor = cone.cursor()
-        command1 = """CREATE TABLE IF NOT EXISTS 
-        arriendos(id_arriendo INTEGER PRIMARY KEY AUTOINCREMENT, mes TEXT NOT NULL,
-        estado TEXT NOT NULL)"""
-        cursor.execute(command1)
-        command2 = """CREATE TABLE IF NOT EXISTS inquilino_arriendo(codigo INTEGER PRIMARY KEY AUTOINCREMENT,
-        id_arriendo INTEGER REFERENCES arriendos(id_arriendo) ON DELETE CASCADE ON UPDATE CASCADE,
-        id_inquilino INTEGER REFERENCES inquilinos(id_inquilino) ON DELETE CASCADE ON UPDATE CASCADE)"""
-        cursor.execute(command2)
-        cone.commit()
-        cone.close()
     
     #para obtener meses
     def obtener_arriendos(self):
@@ -76,7 +62,7 @@ class Logica:
     def realizar_cobro(self, idmes_idinq):
         conn = self.establecer_conexion()
         cursor = conn.cursor()
-        sql = 'INSERT INTO inquilino_arriendo (id_arriendo, id_inquilino) VALUES (?,?)'
+        sql = 'INSERT INTO inquilino_arriendo (id_inquilino, id_arriendo) VALUES (?,?)'
         cursor.execute(sql, idmes_idinq)
         conn.commit()
         conn.close()

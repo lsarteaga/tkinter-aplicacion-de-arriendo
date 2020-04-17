@@ -7,19 +7,14 @@ Created on Mon Apr 13 15:00:31 2020
 """
 #importaciones
 import sqlite3
-
 import tkinter as tk
-
 from tkinter import ttk 
 from tkinter import messagebox as mb
 import logica
 
 class Aplicacion:
     def __init__(self):
-        self.logica = logica.Logica()
-        #insertando cambios de la base de datos
-        self.logica.cambios_db()
-        
+        self.logica = logica.Logica() 
         self.ventana_principal = tk.Tk()
         self.ventana_principal.title('Arriendos')
         self.notebook = ttk.Notebook(self.ventana_principal)
@@ -94,11 +89,7 @@ class Aplicacion:
         self.combo_box = ttk.Combobox(self.pagina3, textvariable = self.opcion_seleccionada, values = lista, state = 'readonly')
         self.combo_box.current(0)
         self.combo_box.grid(column = 0, row = 3, padx = 4, pady = 4, sticky ='we')
-        
-
-        
-
-        
+    
     def modificar_inquilino(self):
         try:
             self.tree.item(self.tree.selection())['values'][0]
@@ -211,15 +202,19 @@ class Aplicacion:
            dato_fila = self.tree2.item(self.tree2.selection())['values']
            #verficando si la fila seleccionada existe en la base de datos
            name = self.logica.verificar_existencia((dato_fila[0], ))
+           print('este es el nombre', name)#####
            if name == None:
                mb.showerror('ERROR','ACTUALICE REGISTROS')
            else:
                datos = (dato_fila[0], self.opcion_seleccionada.get())
+               print('estos son los datos', datos)
                #obteniendo solo los id de los campos seleccionados
                identificadores = self.logica.obtener_ids(datos)
                #identificadores es una lista de tuplas [(id_mes, ), (id_inquilino, )]
+               print('estos son las tuplas', identificadores)
                idmes_idinq = (identificadores[0][0], identificadores[1][0])
                #se realiza un registro en la base de datos
+               print('estos son los idis',idmes_idinq)
                self.logica.realizar_cobro(idmes_idinq)
                mb.showinfo('Informacion','Cobro Realizado')
        except sqlite3.OperationalError:
@@ -235,6 +230,7 @@ class Aplicacion:
     
     def detalle(self):
         self.validar_seleccion()
+        
     
     
 app = Aplicacion()

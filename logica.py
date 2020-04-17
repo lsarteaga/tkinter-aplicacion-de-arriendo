@@ -62,7 +62,7 @@ class Logica:
     def realizar_cobro(self, idmes_idinq):
         conn = self.establecer_conexion()
         cursor = conn.cursor()
-        sql = 'INSERT INTO inquilino_arriendo (id_inquilino, id_arriendo) VALUES (?,?)'
+        sql = 'INSERT INTO inquilino_arriendo (id_arriendo, id_inquilino) VALUES (?,?)'
         cursor.execute(sql, idmes_idinq)
         conn.commit()
         conn.close()
@@ -86,5 +86,13 @@ class Logica:
             return cursor.fetchone()
         finally:
             conn.close()
-        
-
+    #EN REVISION!!!
+    def comprobar_pago(self, idmes_idinq):
+        try:
+            conn = self.establecer_conexion()
+            cursor = conn.cursor()
+            sql = 'SELECT codigo FROM inquilino_arriendo WHERE id_arriendo = ?, id_inquilino = ?'
+            cursor.execute(sql, idmes_idinq)
+            return cursor.fetchone()
+        finally:
+            conn.close()

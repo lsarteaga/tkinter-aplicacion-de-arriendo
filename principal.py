@@ -221,10 +221,11 @@ class Aplicacion:
                idmes_idinq = (identificadores[0][0], identificadores[1][0])
                #se realiza un registro en la base de datos
                print('estos son los idis',idmes_idinq)
-               '''
+               
+               #self.cobro_duplicado(idmes_idinq)
                self.logica.realizar_cobro(idmes_idinq)
                mb.showinfo('Informacion','Cobro Realizado')
-           '''
+           
        except sqlite3.OperationalError:
            print('no existe valor en la base de datos')
            return
@@ -234,6 +235,17 @@ class Aplicacion:
             self.tree2.item(self.tree2.selection())['values'][0]
         except IndexError as e:
             mb.showwarning('Atencion', 'SELECCIONE REGISTRO')
+            return
+    
+    def cobro_duplicado(self, idmes_idinq):
+        print('ya entre')
+        contador = self.logica.comprobar_pago(idmes_idinq)
+        print(contador)
+        try:
+            if contador is not None:
+                mb.showinfo('Informacion','Ya se realizo el cobro')
+        except Exception:
+            print('validacion')
             return
     
     def detalle(self):

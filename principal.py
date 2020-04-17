@@ -198,25 +198,33 @@ class Aplicacion:
    
        try:
            self.validar_seleccion()
-           #obtencion de datos en la fila seleccionada
+           #obtencion de nombre en la fila seleccionada
            dato_fila = self.tree2.item(self.tree2.selection())['values']
-           #verficando si la fila seleccionada existe en la base de datos
+           #verficando si el nombre existe en la base de datos
+           print('dato de la fila ', dato_fila)
+           
+           
            name = self.logica.verificar_existencia((dato_fila[0], ))
            print('este es el nombre', name)#####
+           
            if name == None:
                mb.showerror('ERROR','ACTUALICE REGISTROS')
            else:
-               datos = (dato_fila[0], self.opcion_seleccionada.get())
+               datos = (name[0], self.opcion_seleccionada.get())
                print('estos son los datos', datos)
+           
                #obteniendo solo los id de los campos seleccionados
                identificadores = self.logica.obtener_ids(datos)
                #identificadores es una lista de tuplas [(id_mes, ), (id_inquilino, )]
                print('estos son las tuplas', identificadores)
+               
                idmes_idinq = (identificadores[0][0], identificadores[1][0])
                #se realiza un registro en la base de datos
                print('estos son los idis',idmes_idinq)
+               '''
                self.logica.realizar_cobro(idmes_idinq)
                mb.showinfo('Informacion','Cobro Realizado')
+           '''
        except sqlite3.OperationalError:
            print('no existe valor en la base de datos')
            return

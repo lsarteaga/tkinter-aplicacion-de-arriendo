@@ -87,12 +87,39 @@ class Logica:
         finally:
             conn.close()
     #EN REVISION!!!
-    def comprobar_pago(self, idmes_idinq):
+            
+    def obtener_pagos(self, id_inquilino):
         try:
             conn = self.establecer_conexion()
             cursor = conn.cursor()
-            sql = 'SELECT codigo FROM inquilino_arriendo WHERE id_arriendo = ?, id_inquilino = ?'
-            cursor.execute(sql, idmes_idinq)
+            sql = 'SELECT * FROM inquilino_arriendo WHERE id_inquilino = ?'
+            cursor.execute(sql, id_inquilino)
+            return cursor.fetchall()
+        finally:
+            conn.close()
+            
+    ########
+            
+    def id_inquilino(self, nombre_inquilino):
+        try:
+            conn = self.establecer_conexion()
+            cursor = conn.cursor()
+            sql = 'SELECT id_inquilino FROM inquilinos WHERE nombre = ?'
+            cursor.execute(sql, nombre_inquilino)
             return cursor.fetchone()
         finally:
             conn.close()
+            
+    def datos_scroll(self, id_inquilino):
+        try:
+            
+            conn = self.establecer_conexion()
+            cursor = conn.cursor()
+            sql = 'SELECT codigo,mes FROM inquilino_arriendo JOIN inquilinos ON inquilino_arriendo.id_inquilino = inquilinos.id_inquilino JOIN arriendos ON inquilino_arriendo.id_arriendo = arriendos.id_arriendo WHERE inquilinos.id_inquilino = ?'
+            cursor.execute(sql, id_inquilino)
+            return cursor.fetchall()
+        finally:
+            conn.close()
+            
+            
+        

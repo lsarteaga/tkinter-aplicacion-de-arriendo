@@ -10,6 +10,7 @@ import sqlite3
 import tkinter as tk
 from tkinter import ttk 
 from tkinter import messagebox as mb
+from tkinter import scrolledtext as st
 import logica
 
 class Aplicacion:
@@ -17,6 +18,7 @@ class Aplicacion:
         self.logica = logica.Logica() 
         self.ventana_principal = tk.Tk()
         self.ventana_principal.title('Arriendos')
+        self.ventana_principal.resizable(False, False)
         self.notebook = ttk.Notebook(self.ventana_principal)
         self.primera_pagina()
         self.segunda_pagina()
@@ -99,6 +101,8 @@ class Aplicacion:
         self.datos_antiguos = self.tree.item(self.tree.selection())['values']
         #creacion de la ventana para actualizar datos
         self.dialogo = tk.Toplevel(self.pagina2)
+        self.dialogo.title('Modificacion de Registro')
+        self.dialogo.resizable(False, False)
         ttk.Label(self.dialogo, text = 'NUEVO NOMBRE: ').grid(column = 0, row = 0, padx = 4, pady = 4)
         ttk.Entry(self.dialogo, textvariable = self.nombre_inquilino).grid(column = 1, row = 0, padx = 4, pady = 4)
         ttk.Label(self.dialogo, text = 'NUEVA CEDULA: ').grid(column = 0, row = 1, padx = 4, pady = 4)
@@ -183,11 +187,9 @@ class Aplicacion:
         rows = self.logica.obtener()
         for row in rows:
             self.tree2.insert('', 'end', values = row)
-            
-        
-           
+                
     def obtener_meses(self):
-
+        #retorna una lista con los 12 meses
         elementos = self.logica.obtener_arriendos()
         meses = []
         for item in elementos:
@@ -198,31 +200,19 @@ class Aplicacion:
    
        try:
            self.validar_seleccion()
-           #obtencion de nombre en la fila seleccionada
+           #obtencion los datos en la fila seleccionada
            dato_fila = self.tree2.item(self.tree2.selection())['values']
-           #verficando si el nombre existe en la base de datos
-           print('dato de la fila ', dato_fila)
-           
-           
+           #verificando si el nombre seleccionado existe en la base de datos
            name = self.logica.verificar_existencia((dato_fila[0], ))
-           print('este es el nombre', name)#####
-           
            if name == None:
                mb.showerror('ERROR','ACTUALICE REGISTROS')
            else:
                datos = (name[0], self.opcion_seleccionada.get())
-               print('estos son los datos', datos)
-           
                #obteniendo solo los id de los campos seleccionados
                identificadores = self.logica.obtener_ids(datos)
                #identificadores es una lista de tuplas [(id_mes, ), (id_inquilino, )]
-               print('estos son las tuplas', identificadores)
-               
                idmes_idinq = (identificadores[0][0], identificadores[1][0])
                #se realiza un registro en la base de datos
-               print('estos son los idis',idmes_idinq)
-               
-               #self.cobro_duplicado(idmes_idinq)
                self.logica.realizar_cobro(idmes_idinq)
                mb.showinfo('Informacion','Cobro Realizado')
            
@@ -237,19 +227,62 @@ class Aplicacion:
             mb.showwarning('Atencion', 'SELECCIONE REGISTRO')
             return
     
-    def cobro_duplicado(self, idmes_idinq):
-        print('ya entre')
-        contador = self.logica.comprobar_pago(idmes_idinq)
-        print(contador)
-        try:
-            if contador is not None:
-                mb.showinfo('Informacion','Ya se realizo el cobro')
-        except Exception:
-            print('validacion')
-            return
-    
     def detalle(self):
-        self.validar_seleccion()
+        try:
+           self.validar_seleccion()     
+           #obtencion de los datos en la fila seleccionada
+           dato_fila = self.tree2.item(self.tree2.selection())['values']
+           #verficando si el nombre existe en la base de datos
+           name = self.logica.verificar_existencia((dato_fila[0], ))      
+           if name == None:
+               mb.showerror('ERROR','ACTUALICE REGISTROS')
+           else:
+               self.id_inquilino = self.logica.id_inquilino(name)
+               pagos_inquilino = self.logica.obtener_pagos(self.id_inquilino)
+               #la longitud de la lista indica si hay cobros realizados
+               if len(pagos_inquilino) == 0:
+                   mb.showinfo('Informacion','El inquilino aun no realiza pagos')
+               else:
+                   #insercion de una nueva ventana para mostrar textos
+                   self.dialogo2 = tk.Toplevel(self.pagina3)
+                   self.dialogo2.title('Detalle de pagos')
+                   self.dialogo2.resizable(False, False)
+                   self.dialogo2.protocol("WM_DELETE_WINDOW")        
+                   self.dialogo2.grab_set()
+                   #implementacion de labels y scroll
+                   ttk.Label(self.dialogo2, text = 'Nombre: ').grid(column = 0, row = 0, padx = 4, pady = 4)
+                   nombre_inquilino = tk.StringVar()
+                   nombre_inquilino.set(dato_fila[0])
+                   tk.Entry(self.dialogo2, textvariable = nombre_inquilino, state = 'readonly').grid(column = 1, row = 0, padx = 4, pady = 4)
+                   ttk.Label(self.dialogo2, text = 'Cedula: ').grid(column = 0, row = 1, padx = 4, pady = 4)
+                   cedula_inquilino = tk.StringVar()
+                   cedula_inquilino.set(dato_fila[1])
+                   tk.Entry(self.dialogo2, textvariable = cedula_inquilino, state = 'readonly').grid(column = 1, row = 1, padx = 4, pady = 4)
+                   ttk.Label(self.dialogo2, text = 'Celular: ').grid(column = 0, row = 2, padx = 4, pady = 4)
+                   celular_inquilino = tk.StringVar()
+                   celular_inquilino.set(dato_fila[2])
+                   tk.Entry(self.dialogo2, textvariable = celular_inquilino, state = 'readonly').grid(column = 1, row = 2, padx = 4, pady = 4)
+                   #boton para mostrar el detalle en el scroll text
+                   ttk.Button(self.dialogo2, text = 'Mostrar Detalle', command = self.llenar_scroll).grid(column = 0, row = 3, columnspan = 2, sticky = 'we', padx = 4, pady = 10)
+                   
+                   self.scrolledtext1 = st.ScrolledText(self.dialogo2, width = 30, height = 10)
+                   self.scrolledtext1.grid(column = 0, row = 4, padx = 10, pady = 10, columnspan = 2, sticky = 'we')
+                   #orden de la consulta (codigo, id_arriendo, id_inquilino)          
+        except Exception:
+            pass
+                
+        
+    def llenar_scroll(self):
+        
+        self.scrolledtext1.delete("1.0", tk.END)
+        #obtencion de codigo y mes referente al cobro
+        elementos = self.logica.datos_scroll(self.id_inquilino)
+        for item in elementos:
+            print(item)
+            self.scrolledtext1.insert(tk.END,'Codigo de cobro: ' + str(item[0]) + '\nMes Pagado: ' + str(item[1]) + '\n\n')
+            
+        
+        
         
     
     

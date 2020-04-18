@@ -282,9 +282,6 @@ class Aplicacion:
             self.scrolledtext1.insert(tk.END,'Codigo de cobro: ' + str(item[0]) + '\nMes Pagado: ' + str(item[1]) + '\n\n')
             
         
-        
-        
-    
     
 app = Aplicacion()
 

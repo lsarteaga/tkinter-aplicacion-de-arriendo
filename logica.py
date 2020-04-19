@@ -9,6 +9,7 @@ Created on Mon Apr 13 17:43:10 2020
 import sqlite3
 
 class Logica:
+    
     def establecer_conexion(self):
         conexion = sqlite3.connect('/home/lsarteaga/Projects/bases de datos/registros.db')
         return conexion
@@ -47,7 +48,6 @@ class Logica:
         cone.commit()
         cone.close()
         
-    
     #para obtener meses
     def obtener_arriendos(self):
         try:
@@ -86,7 +86,6 @@ class Logica:
             return cursor.fetchone()
         finally:
             conn.close()
-    #EN REVISION!!!
             
     def obtener_pagos(self, id_inquilino):
         try:
@@ -98,7 +97,6 @@ class Logica:
         finally:
             conn.close()
             
-    ########
             
     def id_inquilino(self, nombre_inquilino):
         try:

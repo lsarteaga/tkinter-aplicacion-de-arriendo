@@ -11,11 +11,12 @@ import tkinter as tk
 from tkinter import ttk 
 from tkinter import messagebox as mb
 from tkinter import scrolledtext as st
-from PIL import Image, ImageTk
 import logica
 
 class Aplicacion:
+    
     def __init__(self):
+        
         self.logica = logica.Logica() 
         self.ventana_principal = tk.Tk()
         self.ventana_principal.title('Arriendos')
@@ -28,6 +29,7 @@ class Aplicacion:
         self.ventana_principal.mainloop()
         
     def primera_pagina(self):
+        
         self.pagina_agregar = ttk.Frame(self.notebook)
         self.notebook.add(self.pagina_agregar, text = 'Agregar Inquilino')
         self.label_frame = ttk.Labelframe(self.pagina_agregar, text = 'Datos inquilino')
@@ -44,9 +46,7 @@ class Aplicacion:
         ttk.Entry(self.label_frame, textvariable = self.celular_inquilino).grid(column = 1, row = 2, padx = 4, pady = 4)
         #boton para agregar
         ttk.Button(self.label_frame, text = 'Agregar', command = self.validacion_datos).grid(column = 0, row = 3, columnspan = 2, sticky = 'we', padx = 4, pady = 10)
-        
-        
-        
+  
     def segunda_pagina(self):
 
         self.pagina2 = ttk.Frame(self.notebook)
@@ -68,6 +68,7 @@ class Aplicacion:
         ttk.Button(self.pagina2, text = 'Eliminar Registro', command = self.eliminar_inquilino).grid(column = 2, row = 3, columnspan = 1, sticky = 'ew')
     
     def tercera_pagina(self):
+        
         self.pagina3 = ttk.Frame(self.notebook)
         self.notebook.add(self.pagina3, text = 'Cobrar Arriendo')
         ttk.Label(self.pagina3, text = '').grid(column = 0, row = 0, padx = 4, pady = 4)
@@ -96,6 +97,7 @@ class Aplicacion:
         self.combo_box.grid(column = 0, row = 3, padx = 4, pady = 4, sticky ='we')
     
     def modificar_inquilino(self):
+        
         try:
             self.tree.item(self.tree.selection())['values'][0]
         except IndexError as e:
@@ -117,6 +119,7 @@ class Aplicacion:
         self.dialogo.grab_set()
       
     def actualizar_datos(self):
+        
         self.datos_actualizados = (self.nombre_inquilino.get(), self.cedula_inquilino.get(), self.celular_inquilino.get(), self.datos_antiguos[0])
         self.logica.actualizar(self.datos_actualizados)
         mb.showinfo('Informacion','Registro actualizado')
@@ -134,6 +137,7 @@ class Aplicacion:
         self.tree.insert('', 'end' ,values = datos_muestra)
         
     def verificar_dialogo(self):
+        
         if self.nombre_inquilino.get() == '' or self.cedula_inquilino.get() == '' or self.celular_inquilino.get() == '':
             mb.showwarning('Atencion','Debe llenar todos los campos')
         else:
@@ -165,18 +169,21 @@ class Aplicacion:
         self.celular_inquilino.set('')   
         
     def validacion_datos(self):
+        
         if self.nombre_inquilino.get() == '' or self.cedula_inquilino.get() == '' or self.celular_inquilino.get() == '':
             mb.showwarning('Atencion','Debe llenar todos los campos')
         else:
             self.agregar_inquilino()
     
     def obtener_inquilinos(self):
+        
         self.limpiar_tabla()
         rows = self.logica.obtener()
         for row in rows:
             self.tree.insert('', 'end', values = row)
 
     def limpiar_tabla(self):
+        
         records = self.tree.get_children()
         for element in records:
             self.tree.delete(element)
@@ -200,23 +207,18 @@ class Aplicacion:
         return meses
     
     def cobrar(self):
-        
+        #validando si existe una fila seleccionada
         try:
-            self.tree2.item(self.tree2.selection())['values']
+            self.tree2.item(self.tree2.selection())['values'][0]
         except IndexError as e:
             mb.showwarning('Atencion', 'SELECCIONE REGISTRO')
             return
-  
-        print('opcion combo box ',self.opcion_seleccionada.get())
         #obtencion los datos en la fila seleccionada
         dato_fila = self.tree2.item(self.tree2.selection())['values']
-        print('dato fila', dato_fila[0])
         #verificando si el nombre seleccionado existe en la base de datos
         name = self.logica.verificar_existencia((dato_fila[0], ))
-        print('nombre',name)
         if name == None:
             mb.showerror('ERROR','ACTUALICE REGISTROS')
-        
         else:
             ######################## verificando si ya pago
             id_inquilino = self.logica.id_inquilino(name)
@@ -229,10 +231,10 @@ class Aplicacion:
             if len(cobros) != 0:
                 mb.showwarning('Atencion','Cobro Realizado Anteriormente')
             else:
-                print('xdxdxd')
+                
+                self.logica.realizar_cobro(idmes_idinq)
+                mb.showinfo('Informacion','Cobro Realizado')
             
-            
-            ###########################
                 '''
                 nombre_mes = self.opcion_seleccionada.get()
                 print(nombre_mes)
@@ -246,9 +248,9 @@ class Aplicacion:
                 self.logica.realizar_cobro(idmes_idinq)
                 mb.showinfo('Informacion','Cobro Realizado')
                 ''' 
-           
-
+                
     def detalle(self):
+        
         try:
             self.tree2.item(self.tree2.selection())['values'][0]
         except IndexError as e:
@@ -262,19 +264,13 @@ class Aplicacion:
         if name == None:
             mb.showerror('ERROR','ACTUALICE REGISTROS')
         else:
-            print(name)
             self.id_inquilino = ''
             self.id_inquilino = self.logica.id_inquilino(name)
-            print(self.id_inquilino)
-            
             pagos_inquilino = self.logica.obtener_pagos(self.id_inquilino)
             #la longitud de la lista indica si hay cobros realizados
-            print('pagos', pagos_inquilino)
-            
             if len(pagos_inquilino) == 0:
                 mb.showinfo('Informacion','El inquilino aun no realiza pagos')
             else:
-                
                 #insercion de una nueva ventana para mostrar textos
                 self.dialogo2 = tk.Toplevel(self.pagina3)
                 self.dialogo2.title('Detalle de pagos')
@@ -299,9 +295,7 @@ class Aplicacion:
                
                 self.scrolledtext1 = st.ScrolledText(self.dialogo2, width = 30, height = 10)
                 self.scrolledtext1.grid(column = 0, row = 4, padx = 10, pady = 10, columnspan = 2, sticky = 'we')
-               #orden de la consulta (codigo, id_arriendo, id_inquilino)          
-        
-                
+               #orden de la consulta (codigo, id_arriendo, id_inquilino)                     
         
     def llenar_scroll(self):
         
@@ -311,8 +305,6 @@ class Aplicacion:
         for item in elementos:
             print(item)
             self.scrolledtext1.insert(tk.END,'Codigo de cobro: ' + str(item[0]) + '\nMes Pagado: ' + str(item[1]) + '\n\n')
-            
-        
-    
+
 app = Aplicacion()
 

@@ -110,6 +110,17 @@ class Logica:
         finally:
             conn.close()
             
+    def id_mes(self, nombre_mes):
+        try:
+            conn = self.establecer_conexion()
+            cursor = conn.cursor()
+            sql = 'Select id_arriendo FROM arriendos WHERE mes = ?'
+            cursor.execute(sql, nombre_mes)
+            return cursor.fetchone()
+        finally:
+            conn.close()
+        
+        
     def datos_scroll(self, id_inquilino):
         try:
             
@@ -117,6 +128,17 @@ class Logica:
             cursor = conn.cursor()
             sql = 'SELECT codigo,mes FROM inquilino_arriendo JOIN inquilinos ON inquilino_arriendo.id_inquilino = inquilinos.id_inquilino JOIN arriendos ON inquilino_arriendo.id_arriendo = arriendos.id_arriendo WHERE inquilinos.id_inquilino = ?'
             cursor.execute(sql, id_inquilino)
+            return cursor.fetchall()
+        finally:
+            conn.close()
+            
+    def verificar_cobro(self, idmes_idinq):
+        
+        try:
+            conn = self.establecer_conexion()
+            cursor = conn.cursor()
+            sql = 'SELECT * FROM inquilino_arriendo WHERE id_arriendo = ? AND id_inquilino = ?'
+            cursor.execute(sql, idmes_idinq)
             return cursor.fetchall()
         finally:
             conn.close()

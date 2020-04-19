@@ -10,7 +10,7 @@ import sqlite3
 
 class Logica:
     def establecer_conexion(self):
-        conexion = sqlite3.connect('arriendos2.db')
+        conexion = sqlite3.connect('/home/lsarteaga/Projects/bases de datos/registros.db')
         return conexion
     
     def agregar(self, datos_inquilino):

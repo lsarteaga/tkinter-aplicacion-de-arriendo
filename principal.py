@@ -197,29 +197,44 @@ class Aplicacion:
         return meses
     
     def cobrar(self):
-   
-       try:
-           self.validar_seleccion()
-           #obtencion los datos en la fila seleccionada
-           dato_fila = self.tree2.item(self.tree2.selection())['values']
-           #verificando si el nombre seleccionado existe en la base de datos
-           name = self.logica.verificar_existencia((dato_fila[0], ))
-           if name == None:
-               mb.showerror('ERROR','ACTUALICE REGISTROS')
-           else:
-               datos = (name[0], self.opcion_seleccionada.get())
-               #obteniendo solo los id de los campos seleccionados
-               identificadores = self.logica.obtener_ids(datos)
-               #identificadores es una lista de tuplas [(id_mes, ), (id_inquilino, )]
-               idmes_idinq = (identificadores[0][0], identificadores[1][0])
-               #se realiza un registro en la base de datos
-               self.logica.realizar_cobro(idmes_idinq)
-               mb.showinfo('Informacion','Cobro Realizado')
-           
-       except sqlite3.OperationalError:
-           print('no existe valor en la base de datos')
-           return
-
+        
+        
+        try:
+            self.tree2.item(self.tree2.selection())['values'][0]
+        except IndexError as e:
+            mb.showwarning('Atencion', 'SELECCIONE REGISTRO')
+            return
+        print('opcion combo box ',self.opcion_seleccionada.get())
+        #obtencion los datos en la fila seleccionada
+        dato_fila = self.tree2.item(self.tree2.selection())['values']
+        print('dato fila', dato_fila[0])
+        #verificando si el nombre seleccionado existe en la base de datos
+        name = self.logica.verificar_existencia((dato_fila[0], ))
+        print('nombre',name)
+        if name == None:
+            mb.showerror('ERROR','ACTUALICE REGISTROS')
+        
+        else:
+            datos = (name[0], self.opcion_seleccionada.get())
+            print(datos)
+            #obteniendo solo los id de los campos seleccionados
+            identificadores = self.logica.obtener_ids(datos)
+            print('identificadores',identificadores)
+            id_inquilino = self.logica.id_inquilino((dato_fila[0], ))
+            print('id inquilino: ', id_inquilino)
+            print(id_inquilino[0])
+            
+            #identificadores es una lista de tuplas [(id_mes, ), (id_inquilino, )]
+            idmes_idinq = (identificadores[1][0], id_inquilino[0])
+            print(idmes_idinq)
+            #se realiza un registro en la base de datos
+            self.logica.realizar_cobro(idmes_idinq)
+            mb.showinfo('Informacion','Cobro Realizado')
+            
+            #pinso hacer busqueda individuales
+            
+       
+    #posible eliminacion
     def validar_seleccion(self):
         try:
             self.tree2.item(self.tree2.selection())['values'][0]
@@ -229,7 +244,12 @@ class Aplicacion:
     
     def detalle(self):
         try:
-           self.validar_seleccion()     
+            self.tree2.item(self.tree2.selection())['values'][0]
+        except IndexError as e:
+            mb.showwarning('Atencion', 'SELECCIONE REGISTRO')
+            return
+        
+        try:  
            #obtencion de los datos en la fila seleccionada
            dato_fila = self.tree2.item(self.tree2.selection())['values']
            #verficando si el nombre existe en la base de datos
@@ -237,6 +257,7 @@ class Aplicacion:
            if name == None:
                mb.showerror('ERROR','ACTUALICE REGISTROS')
            else:
+               self.id_inquilino = ''
                self.id_inquilino = self.logica.id_inquilino(name)
                pagos_inquilino = self.logica.obtener_pagos(self.id_inquilino)
                #la longitud de la lista indica si hay cobros realizados

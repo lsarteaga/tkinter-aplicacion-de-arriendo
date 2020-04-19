@@ -1,0 +1,17 @@
+CREATE TABLE inquilinos(
+	id_inquilino INTEGER PRIMARY KEY,
+	nombre TEXT NOT NULL,
+	cedula TEXT NOT NULL,
+	celular TEXT NOT NULL
+);
+CREATE TABLE arriendos(
+	id_arriendo INTEGER PRIMARY KEY,
+	mes TEXT NOT NULL
+);
+CREATE TABLE inquilino_arriendo(
+	codigo INTEGER PRIMARY KEY,
+	id_inquilino INTEGER REFERENCES inquilinos(id_inquilino) ON UPDATE CASCADE ON DELETE CASCADE,
+	id_arriendo INTEGER NOT NULL
+);
+
+CREATE UNIQUE INDEX index_ids ON inquilino_arriendo(id_inquilino, id_arriendo);
